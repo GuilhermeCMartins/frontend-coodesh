@@ -3,15 +3,25 @@
 import { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { Container, Typography, TextField, Button, Grid } from "@mui/material";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import { toast } from "react-toastify";
+import SectionLogin from "./components/loginComponents/mainContainer";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [nameError, setNameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async () => {
     setNameError(false);
@@ -27,6 +37,8 @@ export default function Login() {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const response = await axios.post(
         "http://localhost:4000/api/auth/login",
@@ -37,30 +49,47 @@ export default function Login() {
       );
       console.log("Login successful!", response.data);
       toast.success("Login successful!");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error during login:", error);
       toast.error("Usuário ou senha incorretos.");
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1300);
     }
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-        padding: "2rem",
-        borderRadius: "8px",
-      }}
-    >
-      <Typography variant="h3" gutterBottom style={{ marginBottom: "1rem" }}>
-        Login
-      </Typography>
-      {error && <div className="error-message">{error}</div>}
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
+    <SectionLogin>
+      <Container
+        maxWidth="sm"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          padding: "2rem",
+          borderRadius: "8px",
+          backgroundColor: "white",
+          minHeight: "40vh",
+          borderTop: "4px solid #2196f3",
+        }}
+      >
+        <Typography
+          variant="h6"
+          gutterBottom
+          style={{
+            marginBottom: "1rem",
+            textTransform: "uppercase",
+            fontWeight: "700",
+          }}
+        >
+          Login
+        </Typography>
+        {error && <div className="error-message">{error}</div>}
+        <Container maxWidth="xs">
           <TextField
             fullWidth
             label="Nome"
@@ -69,9 +98,8 @@ export default function Login() {
             placeholder="Digite seu nome"
             error={nameError}
             helperText={nameError && "Por favor, preencha o campo nome."}
+            style={{ marginBottom: "1rem" }}
           />
-        </Grid>
-        <Grid item xs={12}>
           <TextField
             fullWidth
             type="password"
@@ -81,20 +109,34 @@ export default function Login() {
             placeholder="Digite sua senha"
             error={passwordError}
             helperText={passwordError && "Por favor, preencha o campo senha."}
+            style={{ marginBottom: "1rem" }}
           />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleLogin}>
-            Login
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleLogin}
+          >
+            {isLoading ? (
+              <CircularProgress color="inherit" size={24} />
+            ) : (
+              "Login"
+            )}
           </Button>
-        </Grid>
-      </Grid>
-      <div style={{ marginTop: "1rem" }}>
-        <Typography variant="body1" component="span">
-          Não tem uma conta?&nbsp;
-        </Typography>
-        <Link href="/register">Registre-se</Link>
-      </div>
-    </Container>
+        </Container>
+
+        <div style={{ marginTop: "1rem" }}>
+          <Typography variant="body1" component="span">
+            Não tem uma conta?&nbsp;
+          </Typography>
+          <Link
+            href="/register"
+            style={{ textDecoration: "none", color: "gray" }}
+          >
+            Registre-se
+          </Link>
+        </div>
+      </Container>
+    </SectionLogin>
   );
 }

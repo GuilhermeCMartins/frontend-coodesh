@@ -26,7 +26,7 @@ const useTransactions = () => {
 
     const handleGetByVendor = async (name: string) => {
         try {
-            const response = await axios.get(`${API_URL}/${name}`);
+            const response = await axios.get(`${API_URL}/vendor/${name}`);
             const data = response.data;
             return data.payload;
         } catch (error) {

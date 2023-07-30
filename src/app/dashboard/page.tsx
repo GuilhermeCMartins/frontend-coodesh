@@ -14,15 +14,15 @@ import {
   Container,
   TextField,
   Button,
+  Divider,
 } from "@mui/material";
 import { Transaction } from "../types/types";
 import { useTransactions } from "../hooks/useTransactions";
 import { toast } from "react-toastify";
 import UploadSales from "../components/formComponents/uploadSales";
 import withAuthentication from "../HOC/withAuth";
-import useAuthentication from "../hooks/useAutentication";
-import { useRouter } from "next/navigation";
-import AppMenu from "../components/dashboardComponents/menu";
+import DashboardCards from "../components/dashboardComponents/container";
+import Navbar from "../components/basicComponents/navbar";
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -33,17 +33,9 @@ const Dashboard = () => {
   const [minPriceFilter, setMinPriceFilter] = useState<number | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const { getAllTransactions } = useTransactions();
-  const { logout } = useAuthentication();
-  const router = useRouter();
 
   const handleOpenUploadDialog = () => {
     setIsUploadDialogOpen(true);
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-    toast.success("Usuario deslogado com sucesso.");
   };
 
   const handleCloseUploadDialog = () => {
@@ -126,114 +118,139 @@ const Dashboard = () => {
 
   return (
     <Container>
-      <AppMenu />
-      <Box p={3}>
-        <Typography variant="h4" gutterBottom>
-          Filtros
-        </Typography>
-        <Box display="flex" alignItems="center" marginBottom={2}>
-          <TextField
-            label="Filtrar por Vendedor"
-            value={vendorFilter}
-            onChange={(e) => setVendorFilter(e.target.value)}
-            size="small"
-            variant="outlined"
-          />
-          <TextField
-            label="Filtrar por Produto"
-            value={productFilter}
-            onChange={(e) => setProductFilter(e.target.value)}
-            size="small"
-            variant="outlined"
-          />
-          <TextField
-            label="Preço Mínimo"
-            value={minPriceFilter !== null ? minPriceFilter : ""}
-            onChange={(e) => setMinPriceFilter(parseFloat(e.target.value))}
-            size="small"
-            variant="outlined"
-          />
-          <Box marginLeft={2}>
-            <Button variant="contained" onClick={handleApplyFilters}>
-              Aplicar Filtros
-            </Button>
-          </Box>
-          <Box marginLeft={2}>
-            <Button variant="outlined" onClick={handleClearFilters}>
-              Limpar Filtros
-            </Button>
+      <Navbar />
+      <DashboardCards type="filters">
+        <Box p={3}>
+          <Typography variant="h6" gutterBottom>
+            FILTROS
+          </Typography>
+          <Box display="flex" alignItems="center" marginBottom={2} gap={2}>
+            <TextField
+              label="Filtrar por Vendedor"
+              value={vendorFilter}
+              onChange={(e) => setVendorFilter(e.target.value)}
+              size="small"
+              variant="outlined"
+            />
+            <TextField
+              label="Filtrar por Produto"
+              value={productFilter}
+              onChange={(e) => setProductFilter(e.target.value)}
+              size="small"
+              variant="outlined"
+            />
+            <TextField
+              label="Preço Mínimo"
+              value={minPriceFilter !== null ? minPriceFilter : ""}
+              onChange={(e) => setMinPriceFilter(parseFloat(e.target.value))}
+              size="small"
+              variant="outlined"
+            />
+            <Box marginLeft={2}>
+              <Button variant="contained" onClick={handleApplyFilters}>
+                Aplicar Filtros
+              </Button>
+            </Box>
+            <Box marginLeft={2}>
+              <Button variant="outlined" onClick={handleClearFilters}>
+                Limpar Filtros
+              </Button>
+            </Box>
           </Box>
         </Box>
-      </Box>
-      <Box p={3}>
-        <Typography variant="h4" gutterBottom>
-          Dashboard
-        </Typography>
-        <TableContainer>
+      </DashboardCards>
+      <DashboardCards type="transactions">
+        <Box p={3}>
+          <Typography variant="h6" gutterBottom>
+            TRANSAÇÕES
+          </Typography>
           <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Vendedor</TableCell>
-                  <TableCell>Produto</TableCell>
-                  <TableCell>Preço</TableCell>
-                  <TableCell>Data</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {transactions
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((transaction) => (
-                    <TableRow key={transaction.Id}>
-                      <TableCell>{transaction.Vendor.Name}</TableCell>
-                      <TableCell>{transaction.Product.Name}</TableCell>
-                      <TableCell
-                        style={{
-                          color: transaction.TransactionType.Inbound
-                            ? "green"
-                            : "red",
-                        }}
-                      >
-                        R${transaction.Price}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(transaction.MadeAt).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Vendedor</TableCell>
+                    <TableCell>Produto</TableCell>
+                    <TableCell>Preço</TableCell>
+                    <TableCell>Data</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transactions
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((transaction) => (
+                      <TableRow key={transaction.Id}>
+                        <TableCell>{transaction.Vendor.Name}</TableCell>
+                        <TableCell>{transaction.Product.Name}</TableCell>
+                        <TableCell
+                          style={{
+                            color: transaction.TransactionType.Inbound
+                              ? "green"
+                              : "red",
+                          }}
+                        >
+                          R${transaction.Price}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(transaction.MadeAt).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={transactions.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={transactions.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </TableContainer>
-      </Box>
-      <Box p={3}>
-        <Typography variant="h4" gutterBottom>
-          Totais
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Inbound: R${getTotalInbound().toFixed(2)}
-        </Typography>
-        <Typography variant="h6" gutterBottom color="darkred">
-          Outbound: R${getTotalOutbound().toFixed(2)}
-        </Typography>
-      </Box>
-      <Button variant="outlined" onClick={handleOpenUploadDialog}>
-        Abrir Diálogo de Upload
-      </Button>
-      <UploadSales
-        open={isUploadDialogOpen}
-        onClose={handleCloseUploadDialog}
-        onUploadSuccess={handleFetchTransactions}
-      />
+        </Box>
+        <Divider orientation="vertical" flexItem variant="middle" />
+        <Box
+          p={3}
+          display={"flex"}
+          alignItems={"flex-start"}
+          justifyContent={"flex-start"}
+          flexDirection={"column"}
+          gap={12}
+        >
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Fazer uma nova transação:
+            </Typography>
+            <Button variant="outlined" onClick={handleOpenUploadDialog}>
+              Upload transações
+            </Button>
+            <UploadSales
+              open={isUploadDialogOpen}
+              onClose={handleCloseUploadDialog}
+              onUploadSuccess={handleFetchTransactions}
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Total das transações:
+            </Typography>
+            <Typography variant="h6">
+              Entrada:
+              <Typography variant="h6" gutterBottom color="green">
+                R${getTotalInbound().toFixed(2)}
+              </Typography>
+            </Typography>
+            <Typography variant="h6">
+              Saída:{" "}
+              <Typography variant="h6" gutterBottom color="red">
+                R${getTotalOutbound().toFixed(2)}
+              </Typography>
+            </Typography>
+          </Box>
+        </Box>
+      </DashboardCards>
     </Container>
   );
 };

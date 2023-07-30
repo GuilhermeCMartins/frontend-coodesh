@@ -6,6 +6,6 @@ interface Props {
 }
 
 const SectionLogin = ({ children }: Props) => {
-  return <s.Container>{children}</s.Container>;
+  return <s.LoginContainer>{children}</s.LoginContainer>;
 };
 export default SectionLogin;

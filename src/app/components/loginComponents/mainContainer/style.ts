@@ -1,7 +1,7 @@
 import { styled } from "@/app/stitches.config";
 
 
-const Container = styled("section", {
+const LoginContainer = styled("section", {
     height: "90vh",
     display: "flex",
     justifyContent: "center",
@@ -10,5 +10,5 @@ const Container = styled("section", {
 
 
 export {
-    Container
+    LoginContainer
 }

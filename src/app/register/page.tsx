@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import Link from "next/link";
 import {
   Container,
@@ -9,19 +8,29 @@ import {
   TextField,
   Button,
   CircularProgress,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import SectionLogin from "../components/loginComponents/mainContainer";
+import useAuthentication from "../hooks/useAutentication";
 
 export default function Register() {
   const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
+  const [typeVendor, setTypeVendor] = useState("Creator");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [nameError, setNameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const { register } = useAuthentication();
   const router = useRouter();
+
+  const handleTypeVendor = (type: string) => {
+    setTypeVendor(type);
+  };
 
   const handleRegister = async () => {
     setNameError(false);
@@ -40,18 +49,10 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/auth/register",
-        {
-          name,
-          password,
-        }
-      );
-      console.log("Register successful!", response.data);
+      await register(name, password, typeVendor);
       toast.success("Register successful!");
-      router.push("/login");
+      router.push("/");
     } catch (error) {
-      console.error("Error during register:", error);
       toast.error("Usuário já existente.");
     } finally {
       setTimeout(() => {
@@ -111,6 +112,18 @@ export default function Register() {
             helperText={passwordError && "Por favor, preencha o campo senha."}
             style={{ marginBottom: "1rem" }}
           />
+          <InputLabel id="typeVendor">Escolha o tipo de vendedor</InputLabel>
+          <Select
+            labelId="typeVendor"
+            id="typeVendor"
+            value={typeVendor}
+            label="Vendedor"
+            onChange={() => handleTypeVendor(typeVendor)}
+          >
+            <MenuItem value={"Creator"}>Produtor</MenuItem>
+            <MenuItem value={"Member"}>Afiliado</MenuItem>
+            <MenuItem value={"Admin"}>Administrador</MenuItem>
+          </Select>
           <Button
             variant="contained"
             color="primary"

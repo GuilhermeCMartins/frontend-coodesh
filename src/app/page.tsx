@@ -13,6 +13,7 @@ import {
 import { toast } from "react-toastify";
 import SectionLogin from "./components/loginComponents/mainContainer";
 import { useRouter } from "next/navigation";
+import useAuthentication from "./hooks/useAutentication";
 
 export default function Login() {
   const [name, setName] = useState("");
@@ -22,6 +23,7 @@ export default function Login() {
   const [nameError, setNameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const router = useRouter();
+  const { login } = useAuthentication();
 
   const handleLogin = async () => {
     setNameError(false);
@@ -40,18 +42,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/auth/login",
-        {
-          name,
-          password,
-        }
-      );
-      console.log("Login successful!", response.data);
+      const loggedUser = await login(name, password);
       toast.success("Login successful!");
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error during login:", error);
       toast.error("Usuário ou senha incorretos.");
     } finally {
       setTimeout(() => {

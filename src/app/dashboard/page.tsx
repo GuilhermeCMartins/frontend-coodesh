@@ -24,7 +24,7 @@ import withAuthentication from "../HOC/withAuth";
 import DashboardCards from "../components/dashboardComponents/container";
 import Navbar from "../components/basicComponents/navbar";
 
-const Dashboard = () => {
+const DashboardPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
@@ -180,9 +180,14 @@ const Dashboard = () => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((transaction) => (
                       <TableRow key={transaction.Id}>
-                        <TableCell>{transaction.Vendor.Name}</TableCell>
-                        <TableCell>{transaction.Product.Name}</TableCell>
+                        <TableCell data-testid="vendor-name">
+                          {transaction.Vendor.Name}
+                        </TableCell>
+                        <TableCell data-testid="product-name">
+                          {transaction.Product.Name}
+                        </TableCell>
                         <TableCell
+                          data-testid="product-price"
                           style={{
                             color: transaction.TransactionType.Inbound
                               ? "green"
@@ -236,18 +241,18 @@ const Dashboard = () => {
             <Typography variant="h6" gutterBottom>
               Total das transações:
             </Typography>
-            <Typography variant="h6">
-              Entrada:
+            <Box>
+              Entrada:{" "}
               <Typography variant="h6" gutterBottom color="green">
                 R${getTotalInbound().toFixed(2)}
               </Typography>
-            </Typography>
-            <Typography variant="h6">
+            </Box>
+            <Box>
               Saída:{" "}
               <Typography variant="h6" gutterBottom color="red">
                 R${getTotalOutbound().toFixed(2)}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
         </Box>
       </DashboardCards>
@@ -255,4 +260,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuthentication(Dashboard);
+export default withAuthentication(DashboardPage);

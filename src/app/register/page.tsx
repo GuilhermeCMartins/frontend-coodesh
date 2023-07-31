@@ -119,6 +119,8 @@ export default function Register() {
             value={typeVendor}
             label="Vendedor"
             onChange={() => handleTypeVendor(typeVendor)}
+            style={{ marginBottom: "1rem" }}
+            fullWidth
           >
             <MenuItem value={"Creator"}>Produtor</MenuItem>
             <MenuItem value={"Member"}>Afiliado</MenuItem>

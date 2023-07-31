@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  web:
+    build:
+      dockerfile: .Dockerfile
+    volumes:
+      - .:/app
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    networks:
+      - backend_frontend_network
+
+networks:
+  backend_frontend_network:
+    external: true

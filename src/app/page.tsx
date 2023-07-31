@@ -43,7 +43,7 @@ export default function Login() {
 
     try {
       const loggedUser = await login(name, password);
-      toast.success("Login successful!");
+      toast.success("Login bem sucedido!");
       router.push("/dashboard");
     } catch (error) {
       toast.error("Usuário ou senha incorretos.");
@@ -114,7 +114,7 @@ export default function Login() {
             {isLoading ? (
               <CircularProgress color="inherit" size={24} />
             ) : (
-              "Login"
+              "Entrar"
             )}
           </Button>
         </Container>

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Box,
-  Typography,
   Input,
   Button,
   CircularProgress,
@@ -10,8 +9,8 @@ import {
   DialogContent,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import { useSales } from "@/app/hooks/useSales";
 import { AxiosError } from "axios";
+import { useSales } from "@/app/hooks/useSales";
 
 interface UploadSalesProps {
   onClose: () => void;

@@ -25,7 +25,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 1. Clone the repository:
 
    ```
-   git clone https://github.com/your-username/frontend-coodesh.git
+   git clone https://github.com/GuilhermeCMartins/frontend-coodesh.git
    cd frontend-coodesh
    ```
 
@@ -45,4 +45,3 @@ Follow these instructions to get a copy of the project up and running on your lo
    npm install
    npm run dev
    ```
-

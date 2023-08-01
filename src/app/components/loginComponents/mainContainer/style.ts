@@ -1,5 +1,4 @@
-import { styled } from "@/app/stitches.config";
-
+import { styled } from "@stitches/react"
 
 const LoginContainer = styled("section", {
     height: "90vh",

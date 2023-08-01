@@ -1,5 +1,4 @@
-import { styled } from "@/app/stitches.config";
-
+import { styled } from "@stitches/react"
 
 const Cards = styled("section", {
 

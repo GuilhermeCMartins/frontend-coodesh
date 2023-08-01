@@ -58,13 +58,10 @@ const UploadSales: React.FC<UploadSalesProps> = ({
       const errorResponse = (error as AxiosError<ErrorResponse>)?.response
         ?.data;
       if (errorResponse?.success === false) {
-        const errorMessages = errorResponse.errors.map((errorItem) => {
-          return `${errorItem.line}\n${errorItem.errors.join("\n")}`;
-        });
-        const errorMessage = errorMessages.join("\n\n");
-        toast.error(`Erros ao enviar arquivo de vendas:\n${errorMessage}`, {
+        toast.error(`O arquivo de vendas contém erros de digitação.`, {
           pauseOnHover: true,
         });
+        onClose();
       } else {
         toast.error(
           "Erro ao enviar arquivo de vendas. Por favor, tente novamente."
@@ -90,12 +87,14 @@ const UploadSales: React.FC<UploadSalesProps> = ({
               inputProps={{ accept: ".csv, .xlsx, .xls, .txt" }}
               onChange={handleFileSelect}
               fullWidth
+              data-testid="file-input"
             />
             <Box marginLeft={2}>
               <Button
                 variant="contained"
                 onClick={handleFileUpload}
                 disabled={uploading}
+                data-testid="upload-button"
               >
                 {uploading ? <CircularProgress size={24} /> : "Enviar Arquivo"}
               </Button>

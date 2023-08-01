@@ -44,12 +44,10 @@ const DashboardPage = () => {
 
   const handleFetchTransactions = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       const { transactions } = await getAllTransactions();
       setTransactions(transactions);
       setIsLoading(false);
     } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       toast.error("Erro ao buscar transações");
       setIsLoading(false);
     }

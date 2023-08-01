@@ -26,11 +26,6 @@ const AppMenu: React.FC<MenuProps> = () => {
     setAnchorEl(null);
   };
 
-  const handleTransactions = () => {
-    router.push("/transactions/");
-    handleClose();
-  };
-
   const handleLogout = () => {
     logout();
     router.push("/");
@@ -80,12 +75,6 @@ const AppMenu: React.FC<MenuProps> = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleTransactions}>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Ver as minhas transações
-        </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />

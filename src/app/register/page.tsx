@@ -28,10 +28,6 @@ export default function Register() {
   const { register } = useAuthentication();
   const router = useRouter();
 
-  const handleTypeVendor = (type: string) => {
-    setTypeVendor(type);
-  };
-
   const handleRegister = async () => {
     setNameError(false);
     setPasswordError(false);
@@ -50,14 +46,12 @@ export default function Register() {
 
     try {
       await register(name, password, typeVendor);
-      toast.success("Register successful!");
+      toast.success("Registrado com sucesso!");
       router.push("/");
     } catch (error) {
       toast.error("Usuário já existente.");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1300);
+      setIsLoading(false);
     }
   };
 
@@ -100,6 +94,7 @@ export default function Register() {
             error={nameError}
             helperText={nameError && "Por favor, preencha o campo nome."}
             style={{ marginBottom: "1rem" }}
+            data-testid="name-error"
           />
           <TextField
             fullWidth
@@ -111,6 +106,7 @@ export default function Register() {
             error={passwordError}
             helperText={passwordError && "Por favor, preencha o campo senha."}
             style={{ marginBottom: "1rem" }}
+            data-testid="password-error"
           />
           <InputLabel id="typeVendor">Escolha o tipo de vendedor</InputLabel>
           <Select
@@ -118,7 +114,7 @@ export default function Register() {
             id="typeVendor"
             value={typeVendor}
             label="Vendedor"
-            onChange={() => handleTypeVendor(typeVendor)}
+            onChange={(e) => setTypeVendor(e.target.value)}
             style={{ marginBottom: "1rem" }}
             fullWidth
           >

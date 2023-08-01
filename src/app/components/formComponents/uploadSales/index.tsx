@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useSales } from "@/app/hooks/useSales";
 
-interface UploadSalesProps {
+export interface UploadSalesProps {
   onClose: () => void;
   onUploadSuccess: () => void;
   open: boolean;

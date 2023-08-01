@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -32,6 +31,7 @@ const DashboardPage = () => {
   const [productFilter, setProductFilter] = useState<string>("");
   const [minPriceFilter, setMinPriceFilter] = useState<number | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { getAllTransactions } = useTransactions();
 
   const handleOpenUploadDialog = () => {
@@ -44,10 +44,14 @@ const DashboardPage = () => {
 
   const handleFetchTransactions = async () => {
     try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const { transactions } = await getAllTransactions();
       setTransactions(transactions);
+      setIsLoading(false);
     } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       toast.error("Erro ao buscar transações");
+      setIsLoading(false);
     }
   };
 
@@ -131,6 +135,7 @@ const DashboardPage = () => {
               onChange={(e) => setVendorFilter(e.target.value)}
               size="small"
               variant="outlined"
+              data-testid="vendor-filter-input"
             />
             <TextField
               label="Filtrar por Produto"
@@ -138,6 +143,7 @@ const DashboardPage = () => {
               onChange={(e) => setProductFilter(e.target.value)}
               size="small"
               variant="outlined"
+              data-testid="product-filter-input"
             />
             <TextField
               label="Preço Mínimo"
@@ -145,9 +151,14 @@ const DashboardPage = () => {
               onChange={(e) => setMinPriceFilter(parseFloat(e.target.value))}
               size="small"
               variant="outlined"
+              data-testid="min-price-filter-input"
             />
             <Box marginLeft={2}>
-              <Button variant="contained" onClick={handleApplyFilters}>
+              <Button
+                variant="contained"
+                onClick={handleApplyFilters}
+                data-testid="apply-filters-button"
+              >
                 Aplicar Filtros
               </Button>
             </Box>
@@ -164,56 +175,74 @@ const DashboardPage = () => {
           <Typography variant="h6" gutterBottom>
             TRANSAÇÕES
           </Typography>
-          <TableContainer>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Vendedor</TableCell>
-                    <TableCell>Produto</TableCell>
-                    <TableCell>Preço</TableCell>
-                    <TableCell>Data</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {transactions
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((transaction) => (
-                      <TableRow key={transaction.Id}>
-                        <TableCell data-testid="vendor-name">
-                          {transaction.Vendor.Name}
-                        </TableCell>
-                        <TableCell data-testid="product-name">
-                          {transaction.Product.Name}
-                        </TableCell>
-                        <TableCell
-                          data-testid="product-price"
-                          style={{
-                            color: transaction.TransactionType.Inbound
-                              ? "green"
-                              : "red",
-                          }}
-                        >
-                          R${transaction.Price}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(transaction.MadeAt).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={transactions.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
+          {isLoading ? (
+            <Box
+              style={{
+                width: "30vw",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="body1" gutterBottom>
+                Carregando...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Vendedor</TableCell>
+                      <TableCell>Produto</TableCell>
+                      <TableCell>Preço</TableCell>
+                      <TableCell>Data</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transactions
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((transaction) => (
+                        <TableRow key={transaction.Id}>
+                          <TableCell data-testid="vendor-name">
+                            {transaction.Vendor.Name}
+                          </TableCell>
+                          <TableCell data-testid="product-name">
+                            {transaction.Product.Name}
+                          </TableCell>
+                          <TableCell
+                            data-testid="product-price"
+                            style={{
+                              color: transaction.TransactionType.Inbound
+                                ? "green"
+                                : "red",
+                            }}
+                          >
+                            R${transaction.Price}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(transaction.MadeAt).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={transactions.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </>
+          )}
         </Box>
         <Divider orientation="vertical" flexItem variant="middle" />
         <Box
@@ -241,13 +270,13 @@ const DashboardPage = () => {
             <Typography variant="h6" gutterBottom>
               Total das transações:
             </Typography>
-            <Box>
+            <Box data-testid="inbound">
               Entrada:{" "}
               <Typography variant="h6" gutterBottom color="green">
                 R${getTotalInbound().toFixed(2)}
               </Typography>
             </Box>
-            <Box>
+            <Box data-testid="outbound">
               Saída:{" "}
               <Typography variant="h6" gutterBottom color="red">
                 R${getTotalOutbound().toFixed(2)}

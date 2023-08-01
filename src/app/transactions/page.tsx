@@ -32,6 +32,7 @@ export default function Transactions() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const { getByVendor } = useTransactions();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -40,13 +41,18 @@ export default function Transactions() {
         const decodedToken = jwt.decode(token);
         const { vendorName } = decodedToken as Token;
         getByVendor(vendorName)
-          .then((data) => setTransactions(data.transactions))
-          .catch((error) =>
-            console.error("Error fetching transactions:", error)
-          );
+          .then((data) => {
+            setTransactions(data.transactions);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching transactions:", error);
+            setIsLoading(false);
+          });
       }
     } catch (error) {
       console.error("Erro ao decodificar token:", error);
+      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -93,51 +99,74 @@ export default function Transactions() {
           <Typography variant="h6" gutterBottom>
             TRANSAÇÕES
           </Typography>
-          <TableContainer>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Vendedor</TableCell>
-                    <TableCell>Produto</TableCell>
-                    <TableCell>Preço</TableCell>
-                    <TableCell>Data</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {transactions
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((transaction) => (
-                      <TableRow key={transaction.Id}>
-                        <TableCell>{transaction.Vendor.Name}</TableCell>
-                        <TableCell>{transaction.Product.Name}</TableCell>
-                        <TableCell
-                          style={{
-                            color: transaction.TransactionType.Inbound
-                              ? "green"
-                              : "red",
-                          }}
-                        >
-                          R${transaction.Price}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(transaction.MadeAt).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={transactions.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
+          {isLoading ? (
+            <Box
+              style={{
+                width: "30vw",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="body1" gutterBottom>
+                Carregando...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Vendedor</TableCell>
+                      <TableCell>Produto</TableCell>
+                      <TableCell>Preço</TableCell>
+                      <TableCell>Data</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transactions
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((transaction) => (
+                        <TableRow key={transaction.Id}>
+                          <TableCell data-testid="vendor-name">
+                            {transaction.Vendor.Name}
+                          </TableCell>
+                          <TableCell data-testid="product-name">
+                            {transaction.Product.Name}
+                          </TableCell>
+                          <TableCell
+                            data-testid="product-price"
+                            style={{
+                              color: transaction.TransactionType.Inbound
+                                ? "green"
+                                : "red",
+                            }}
+                          >
+                            R${transaction.Price}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(transaction.MadeAt).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={transactions.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </>
+          )}
         </Box>
         <Divider orientation="vertical" flexItem variant="middle" />
         <Box
@@ -152,18 +181,18 @@ export default function Transactions() {
             <Typography variant="h6" gutterBottom>
               Total das transações:
             </Typography>
-            <Typography variant="h6">
-              Entrada:
+            <Box data-testid="inbound">
+              Entrada:{" "}
               <Typography variant="h6" gutterBottom color="green">
                 R${getTotalInbound().toFixed(2)}
               </Typography>
-            </Typography>
-            <Typography variant="h6">
+            </Box>
+            <Box data-testid="outbound">
               Saída:{" "}
               <Typography variant="h6" gutterBottom color="red">
                 R${getTotalOutbound().toFixed(2)}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
         </Box>
       </DashboardCards>
